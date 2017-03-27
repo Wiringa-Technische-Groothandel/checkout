@@ -1,72 +1,44 @@
 <?php
 
-namespace Modules\Checkout\Http\Controllers;
+namespace WTG\Checkout\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use WTG\Checkout\Requests\FinishOrderRequest;
+use WTG\Checkout\Events\AfterFinishOrderEvent;
+use WTG\Checkout\Events\BeforeFinishOrderEvent;
 
+/**
+ * Checkout controller
+ *
+ * @package     WTG\Checkout
+ * @subpackage  Controllers
+ * @author      Thomas Wiringa <thomas.wiringa@gmail.com>
+ */
 class CheckoutController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     * @return Response
+     * Turn a quote into an order
+     *
+     * @param FinishOrderRequest $request
      */
-    public function index()
+    public function finish(FinishOrderRequest $request)
     {
-        return view('checkout::index');
-    }
+        $quote = \Auth::user()->getQuote();
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Response
-     */
-    public function create()
-    {
-        return view('checkout::create');
-    }
+        \Event::fire(BeforeFinishOrderEvent::class, [
+            "user" => \Auth::user(),
+            "quote" => $quote
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     * @param  Request $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-    }
+        $order = $quote->toOrder();
 
-    /**
-     * Show the specified resource.
-     * @return Response
-     */
-    public function show()
-    {
-        return view('checkout::show');
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @return Response
-     */
-    public function edit()
-    {
-        return view('checkout::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param  Request $request
-     * @return Response
-     */
-    public function update(Request $request)
-    {
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @return Response
-     */
-    public function destroy()
-    {
+        \Event::fire(AfterFinishOrderEvent::class, [
+            "user" => \Auth::user(),
+            "quote" => $quote,
+            "order" => $order
+        ]);
     }
 }

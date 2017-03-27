@@ -2,18 +2,18 @@
 
 namespace WTG\Checkout\Models;
 
-use WTG\Checkout\Interfaces\QuoteItemInterface;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Model;
+use WTG\Checkout\Interfaces\OrderItemInterface;
 
 /**
- * Quote item model
+ * Order item model
  *
  * @package     WTG\Checkout
  * @subpackage  Models
  * @author      Thomas Wiringa <thomas.wiringa@gmail.com>
  */
-class QuoteItem extends Model implements QuoteItemInterface
+class OrderItem extends Model implements OrderItemInterface
 {
     /**
      * @var array
@@ -30,9 +30,9 @@ class QuoteItem extends Model implements QuoteItemInterface
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function quote()
+    public function order()
     {
-        return $this->belongsTo(Quote::class);
+        return $this->belongsTo(Order::class);
     }
 
     /**

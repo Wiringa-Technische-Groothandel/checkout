@@ -4,7 +4,7 @@ namespace WTG\Checkout\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class EditProductRequest extends FormRequest
+class FinishOrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class EditProductRequest extends FormRequest
     public function rules()
     {
         return [
-            "products" => "required"
+            "address" => ["required", "exists:addresses"]
         ];
     }
 }

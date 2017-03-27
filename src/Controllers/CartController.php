@@ -2,6 +2,7 @@
 
 namespace WTG\Checkout\Controllers;
 
+use WTG\Checkout\Models\QuoteItem;
 use WTG\Checkout\Requests\DeleteProductRequest;
 use WTG\Checkout\Requests\EditProductRequest;
 use WTG\Checkout\Requests\AddProductRequest;
@@ -47,20 +48,24 @@ class CartController extends Controller
     public function edit(EditProductRequest $request)
     {
         $quote = $this->getActiveQuote();
-        dd($request->input('products'));
+        $products = $request->input('products');
+        $quoteItems = $quote->items()->whereIn('id', array_keys($products))->get();
 
-        $product = Product::find();
-        if ($product === null) {
-            return back();
-        }
+        try {
+            $quoteItems->each(function ($quoteItem) use($products) {
+                $qty = $products[$quoteItem->getId()]['qty'];
+                $quoteItem->setQuantity($qty);
+                $quoteItem->save();
+            });
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage(), $e->getTrace());
 
-        if ($quote->editProduct($product, ['quantity' => $request->input('quantity')])) {
             return back()
-                ->with('status', trans('checkout::cart.item_update_success'));
+                ->withErrors(trans('checkout::cart.item_update_error'));
         }
 
         return back()
-            ->withErrors(trans('checkout::cart.item_update_error'));
+            ->with('status', trans('checkout::cart.item_update_success'));
     }
 
     /**

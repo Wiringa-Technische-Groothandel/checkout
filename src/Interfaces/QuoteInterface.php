@@ -2,8 +2,8 @@
 
 namespace WTG\Checkout\Interfaces;
 
-use Illuminate\Contracts\Auth\Authenticatable;
-use WTG\Catalog\Interfaces\CustomerInterface;
+use WTG\Checkout\Models\Order;
+use WTG\Customer\Interfaces\CustomerInterface;
 
 /**
  * Quote interface
@@ -17,10 +17,10 @@ interface QuoteInterface
     /**
      * Get a quote by the user, or create if the user does not have a quote.
      *
-     * @param  Authenticatable  $user
+     * @param  CustomerInterface  $user
      * @return static
      */
-    public static function findQuoteByUser(Authenticatable $user);
+    public static function findQuoteByUser(CustomerInterface $user);
 
     /**
      * Get the quote id.
@@ -69,4 +69,11 @@ interface QuoteInterface
      * @return int
      */
     public function getItemCount(): int;
+
+    /**
+     * Turn a quote into an order
+     *
+     * @return Order
+     */
+    public function toOrder(): Order;
 }

@@ -2,9 +2,8 @@
 
 namespace WTG\Checkout\Models;
 
-use Illuminate\Contracts\Auth\Authenticatable;
 use WTG\Checkout\Exceptions\QuoteItemNotFoundException;
-use WTG\Catalog\Interfaces\CustomerInterface;
+use WTG\Customer\Interfaces\CustomerInterface;
 use WTG\Checkout\Interfaces\QuoteInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
@@ -19,10 +18,10 @@ class Quote extends Model implements QuoteInterface
     /**
      * Get a quote by the user, or create a new one if the user has not active quote
      *
-     * @param  Authenticatable  $user
+     * @param  CustomerInterface  $user
      * @return static
      */
-    public static function findQuoteByUser(Authenticatable $user)
+    public static function findQuoteByUser(CustomerInterface $user)
     {
         return static::firstOrCreate([
             'user_id' => $user->id
@@ -140,6 +139,18 @@ class Quote extends Model implements QuoteInterface
     public function getItemCount(): int
     {
         return $this->items()->count();
+    }
+
+    /**
+     * Turn the quote into an order
+     *
+     * @return Order
+     */
+    public function toOrder(): Order
+    {
+        $order = new Order;
+        $order->setCustomerId(\Auth::id());
+        $order->setGrandTotal($this->getGrandTotal(true));
     }
 
     /**
