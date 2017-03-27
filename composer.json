@@ -1,0 +1,25 @@
+{
+    "name": "wtg/checkout",
+    "description": "Checkout module for WTG/webshop",
+    "authors": [
+        {
+            "name": "Thomas Wiringa",
+            "email": "thomas.wiringa@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "WTG\\Checkout\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=7.0",
+        "illuminate/support": "5.4.*",
+        "wtg/catalog": "dev-master"
+    }
+}
