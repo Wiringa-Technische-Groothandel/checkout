@@ -11,9 +11,9 @@ use App\Models\User;
 class Quote extends Model implements QuoteInterface
 {
     /**
-     * @var array
+     * @var bool
      */
-    protected $guarded = ['id'];
+    public $incrementing = false;
 
     /**
      * Get a quote by the user, or create a new one if the user has not active quote

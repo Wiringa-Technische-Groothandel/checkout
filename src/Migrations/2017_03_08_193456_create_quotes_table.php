@@ -14,9 +14,8 @@ class CreateQuotesTable extends Migration
     public function up()
     {
         Schema::create('quotes', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('user_id', false, true);
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->uuid('id')->primary();
+            $table->uuid('customer_id');
             $table->timestamps();
         });
     }

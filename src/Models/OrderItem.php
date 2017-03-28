@@ -16,9 +16,9 @@ use WTG\Checkout\Interfaces\OrderItemInterface;
 class OrderItem extends Model implements OrderItemInterface
 {
     /**
-     * @var array
+     * @var bool
      */
-    protected $guarded = ['id'];
+    public $incrementing = false;
 
     /**
      * @var bool

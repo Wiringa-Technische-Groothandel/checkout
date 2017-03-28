@@ -16,9 +16,9 @@ use App\Models\Product;
 class QuoteItem extends Model implements QuoteItemInterface
 {
     /**
-     * @var array
+     * @var bool
      */
-    protected $guarded = ['id'];
+    public $incrementing = false;
 
     /**
      * @var bool

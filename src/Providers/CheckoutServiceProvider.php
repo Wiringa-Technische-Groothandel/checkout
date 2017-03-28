@@ -4,6 +4,13 @@ namespace WTG\Checkout\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Checkout service provider
+ *
+ * @package     WTG\Checkout
+ * @subpackage  Providers
+ * @author      Thomas Wiringa <thomas.wiringa@gmail.com>
+ */
 class CheckoutServiceProvider extends ServiceProvider
 {
     /**

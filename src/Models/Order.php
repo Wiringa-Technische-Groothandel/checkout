@@ -15,6 +15,11 @@ use WTG\Checkout\Interfaces\OrderInterface;
 class Order extends Model implements OrderInterface
 {
     /**
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
      * The order items
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
