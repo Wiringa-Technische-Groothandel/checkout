@@ -23,11 +23,27 @@ interface QuoteInterface
     public static function findQuoteByUser(CustomerInterface $user);
 
     /**
+     * Get the quote id
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setId(string $id);
+
+    /**
      * Get the quote id.
      *
-     * @return int
+     * @return string
      */
-    public function getId(): int;
+    public function getId(): string;
+
+    /**
+     * Set the customer id.
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setCustomerId(string $id);
 
     /**
      * Add a product to the quote or modify if it exists.

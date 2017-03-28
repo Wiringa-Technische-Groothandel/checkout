@@ -2,6 +2,7 @@
 
 namespace WTG\Checkout\Models;
 
+use Webpatser\Uuid\Uuid;
 use WTG\Checkout\Exceptions\QuoteItemNotFoundException;
 use WTG\Customer\Interfaces\CustomerInterface;
 use WTG\Checkout\Interfaces\QuoteInterface;
@@ -18,14 +19,21 @@ class Quote extends Model implements QuoteInterface
     /**
      * Get a quote by the user, or create a new one if the user has not active quote
      *
-     * @param  CustomerInterface  $user
+     * @param  CustomerInterface  $customer
      * @return static
      */
-    public static function findQuoteByUser(CustomerInterface $user)
+    public static function findQuoteByUser(CustomerInterface $customer)
     {
-        return static::firstOrCreate([
-            'user_id' => $user->id
-        ]);
+        $quote = static::where('customer_id', $customer->getId())->first();
+
+        if ($quote === null) {
+            $quote = new static;
+            $quote->setId(Uuid::generate(4));
+            $quote->setCustomerId($customer->getId());
+            $quote->save();
+        }
+
+        return $quote;
     }
 
     /**
@@ -51,11 +59,37 @@ class Quote extends Model implements QuoteInterface
     /**
      * Get the quote id
      *
-     * @return int
+     * @param  string  $id
+     * @return $this
      */
-    public function getId(): int
+    public function setId(string $id)
     {
-        return $this->attributes[$this->getKeyName()];
+        $this->attributes['id'] = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the quote id
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->attributes['id'];
+    }
+
+    /**
+     * Set the customer id.
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setCustomerId(string $id)
+    {
+        $this->attributes['customer_id'] = $id;
+
+        return $this;
     }
 
     /**

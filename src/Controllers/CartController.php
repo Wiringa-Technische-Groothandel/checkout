@@ -5,7 +5,7 @@ namespace WTG\Checkout\Controllers;
 use WTG\Checkout\Models\QuoteItem;
 use WTG\Checkout\Requests\DeleteProductRequest;
 use WTG\Checkout\Requests\EditProductRequest;
-use WTG\Checkout\Requests\AddProductRequest;
+use WTG\Checkout\Requests\LoginRequest;
 use Illuminate\Routing\Controller;
 use WTG\Catalog\Models\Product;
 use WTG\Checkout\Models\Quote;
@@ -22,10 +22,10 @@ class CartController extends Controller
     /**
      * Add a product to the cart.
      *
-     * @param  AddProductRequest  $request
+     * @param  LoginRequest  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function add(AddProductRequest $request)
+    public function add(LoginRequest $request)
     {
         $quote = $this->getActiveQuote();
         $product = Product::find($request->input('product'));

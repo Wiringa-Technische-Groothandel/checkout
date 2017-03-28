@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddForeignKeys1 extends Migration
+class AddCheckoutForeignKeys1 extends Migration
 {
     /**
      * Run the migrations.
@@ -46,7 +46,8 @@ class AddForeignKeys1 extends Migration
         });
 
         Schema::table('quote_items', function (Blueprint $table) {
-            $table->dropForeign(['quote_id', 'product_id']);
+            $table->dropForeign(['quote_id']);
+            $table->dropForeign(['product_id']);
         });
 
         Schema::table('quotes', function (Blueprint $table) {
