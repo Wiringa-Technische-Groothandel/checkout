@@ -2,7 +2,8 @@
 
 namespace WTG\Checkout\Interfaces;
 
-use WTG\Checkout\Models\Order;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use WTG\Customer\Interfaces\CustomerInterface;
 
 /**
@@ -15,12 +16,13 @@ use WTG\Customer\Interfaces\CustomerInterface;
 interface QuoteInterface
 {
     /**
-     * Get a quote by the user, or create if the user does not have a quote.
+     * Get a quote by the user, or create a new one if the user has not active quote
      *
-     * @param  CustomerInterface  $user
-     * @return static
+     * @param  string  $customerId
+     * @param  string  $companyId
+     * @return QuoteInterface
      */
-    public static function findQuoteByUser(CustomerInterface $user);
+    public static function findQuoteByCustomerId(string $customerId, string $companyId): QuoteInterface;
 
     /**
      * Get the quote id
@@ -46,30 +48,52 @@ interface QuoteInterface
     public function setCustomerId(string $id);
 
     /**
+     * Get the customer id.
+     *
+     * @return string
+     */
+    public function getCustomerId(): string;
+
+    /**
+     * Set the company id.
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setCompanyId(string $id);
+
+    /**
+     * Get the company id.
+     *
+     * @return string
+     */
+    public function getCompanyId(): string;
+
+    /**
      * Add a product to the quote or modify if it exists.
      *
-     * @param  CustomerInterface  $product
+     * @param  string  $productId
      * @param  float  $quantity
-     * @return bool
+     * @return bool|Model
      */
-    public function addProduct(CustomerInterface $product, float $quantity = 1.00): bool;
+    public function addProduct(string $productId, float $quantity = 1.00);
 
     /**
      * Edit a quote item.
      *
-     * @param  CustomerInterface  $product
+     * @param  string  $productId
      * @param  array  $options
      * @return bool
      */
-    public function editProduct(CustomerInterface $product, array $options): bool;
+    public function editProduct(string $productId, array $options): bool;
 
     /**
      * Remove a product from the quote.
      *
-     * @param  CustomerInterface  $product
+     * @param  string  $productId
      * @return bool
      */
-    public function removeProduct(CustomerInterface $product): bool;
+    public function removeProduct(string $productId): bool;
 
     /**
      * Get the sum of the price of all quote items.
@@ -78,6 +102,20 @@ interface QuoteInterface
      * @return float
      */
     public function getGrandTotal(bool $withDiscount): float;
+
+    /**
+     * Get the associated items
+     *
+     * @return Collection
+     */
+    public function getItems(): Collection;
+
+    /**
+     * Get the customer
+     *
+     * @return CustomerInterface
+     */
+    public function getCustomer(): CustomerInterface;
 
     /**
      * Get the number of items in the quote.
@@ -89,7 +127,7 @@ interface QuoteInterface
     /**
      * Turn a quote into an order
      *
-     * @return Order
+     * @return OrderInterface
      */
-    public function toOrder(): Order;
+    public function toOrder(): OrderInterface;
 }

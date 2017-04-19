@@ -16,6 +16,7 @@ class CreateQuotesTable extends Migration
         Schema::create('quotes', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('customer_id');
+            $table->uuid('company_id');
             $table->timestamps();
         });
     }

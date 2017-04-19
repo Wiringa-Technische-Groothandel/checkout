@@ -2,9 +2,10 @@
 
 namespace WTG\Checkout\Models;
 
-use WTG\Checkout\Interfaces\QuoteItemInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Product;
+use WTG\Checkout\Interfaces\QuoteInterface;
+use WTG\Catalog\Interfaces\ProductInterface;
+use WTG\Checkout\Interfaces\QuoteItemInterface;
 
 /**
  * Quote item model
@@ -30,9 +31,9 @@ class QuoteItem extends Model implements QuoteItemInterface
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function quote()
+    protected function quote()
     {
-        return $this->belongsTo(Quote::class);
+        return $this->belongsTo(app()->make(QuoteInterface::class));
     }
 
     /**
@@ -40,17 +41,30 @@ class QuoteItem extends Model implements QuoteItemInterface
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function product()
+    protected function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(app()->make(ProductInterface::class));
     }
 
     /**
-     * Get the quote item id
+     * Set the quote item id.
      *
-     * @return int
+     * @param  string  $id
+     * @return $this
      */
-    public function getId()
+    public function setId(string $id)
+    {
+        $this->attributes['id'] = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the quote item id.
+     *
+     * @return string
+     */
+    public function getId(): string
     {
         return $this->attributes['id'];
     }
@@ -81,7 +95,7 @@ class QuoteItem extends Model implements QuoteItemInterface
     /**
      * Get the attached product.
      *
-     * @return Product|null
+     * @return ProductInterface|null
      */
     public function getProduct()
     {
@@ -91,13 +105,23 @@ class QuoteItem extends Model implements QuoteItemInterface
     /**
      * Set the product id.
      *
-     * @param  int  $productId
+     * @param  string  $productId
      * @return $this
      */
-    public function setProductId(int $productId)
+    public function setProductId(string $productId)
     {
         $this->attributes['product_id'] = $productId;
 
         return $this;
+    }
+
+    /**
+     * Get the product id.
+     *
+     * @return string
+     */
+    public function getProductId(): string
+    {
+        return $this->attributes['product_id'];
     }
 }

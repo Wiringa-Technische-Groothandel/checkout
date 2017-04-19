@@ -3,7 +3,9 @@
 namespace WTG\Checkout\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use WTG\Checkout\Interfaces\OrderInterface;
+use WTG\Checkout\Interfaces\OrderItemInterface;
 
 /**
  * Order model
@@ -20,23 +22,77 @@ class Order extends Model implements OrderInterface
     public $incrementing = false;
 
     /**
+     * @param  string  $companyId
+     * @return Builder
+     */
+    public static function getByCompanyId(string $companyId): Builder
+    {
+        return static::where('company_id', $companyId);
+    }
+
+    /**
+     * @param  string  $customerId
+     * @return Builder
+     */
+    public function getByCustomerId(string $customerId): Builder
+    {
+        return static::where('customer_id', $customerId);
+    }
+
+    /**
      * The order items
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function items()
+    protected function items()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(app()->make(OrderItemInterface::class));
+    }
+
+    /**
+     * Set the order id
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setId(string $id)
+    {
+        $this->attributes['id'] = $id;
+
+        return $this;
     }
 
     /**
      * Get the order id
      *
-     * @return int
+     * @return string
      */
-    public function getId(): int
+    public function getId(): string
     {
         return $this->attributes['id'];
+    }
+
+    /**
+     * Set the company id.
+     *
+     * @param  int  $id
+     * @return $this
+     */
+    public function setCompanyId(int $id)
+    {
+        $this->attributes['company_id'] = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the company id.
+     *
+     * @return string
+     */
+    public function getCompanyId(): string
+    {
+        return $this->attributes['company_id'];
     }
 
     /**
@@ -50,6 +106,16 @@ class Order extends Model implements OrderInterface
         $this->attributes['customer_id'] = $id;
 
         return $this;
+    }
+
+    /**
+     * Get the customer id.
+     *
+     * @return string
+     */
+    public function getCustomerId(): string
+    {
+        return $this->attributes['customer_id'];
     }
 
     /**

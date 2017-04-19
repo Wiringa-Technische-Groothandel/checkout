@@ -21,7 +21,6 @@
         "php": ">=7.0",
         "illuminate/support": "5.4.*",
         "wtg/catalog": "dev-master",
-        "wtg/customer": "dev-master",
         "webpatser/laravel-uuid": "2.*"
     }
 }

@@ -2,6 +2,8 @@
 
 namespace WTG\Checkout\Interfaces;
 
+use Illuminate\Database\Eloquent\Builder;
+
 /**
  * Order interface
  *
@@ -12,19 +14,63 @@ namespace WTG\Checkout\Interfaces;
 interface OrderInterface
 {
     /**
-     * Get the quote id.
+     * Get orders by the company id.
      *
-     * @return int
+     * @param  string  $companyId
+     * @return Builder
      */
-    public function getId(): int;
+    public static function getByCompanyId(string $companyId): Builder;
 
     /**
-     * Set the customer id
+     * @param  string  $customerId
+     * @return Builder
+     */
+    public function getByCustomerId(string $customerId): Builder;
+
+    /**
+     * Set the order id
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setId(string $id);
+
+    /**
+     * Get the order id
+     *
+     * @return string
+     */
+    public function getId(): string;
+
+    /**
+     * Set the company id.
+     *
+     * @param  int  $id
+     * @return $this
+     */
+    public function setCompanyId(int $id);
+
+    /**
+     * Get the company id.
+     *
+     * @return string
+     */
+    public function getCompanyId(): string;
+
+    /**
+     * Set the customer id.
      *
      * @param  int  $id
      * @return $this
      */
     public function setCustomerId(int $id);
+
+    /**
+     * Get the customer id.
+     *
+     * @return string
+     */
+    public function getCustomerId(): string;
 
     /**
      * Set the grand total

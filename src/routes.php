@@ -3,17 +3,18 @@
 Route::group([
     'middleware' => ['web', 'auth'],
     'namespace' => 'WTG\Checkout\Controllers',
+    'prefix' => 'checkout',
     'as' => 'checkout::'
-], function()
-{
+], function() {
     Route::group([
         'prefix' => 'cart',
         'as' => 'cart.'
     ], function () {
-        Route::post('add', 'CartController@add')->name('add');
-        Route::post('edit', 'CartController@edit')->name('edit');
+        Route::put('add', 'CartController@add')->name('add');
+        Route::patch('update/{item}', 'CartController@update')->name('update'); // Edit a single update
+        Route::patch('edit', 'CartController@edit')->name('edit'); // Edit the whole cart
 
-        Route::delete('delete', 'CartController@delete')->name('delete');
+        Route::delete('delete/{item}', 'CartController@delete')->name('delete');
         Route::delete('destroy', 'CartController@destroy')->name('destroy');
     });
 });

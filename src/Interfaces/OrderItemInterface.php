@@ -12,6 +12,14 @@ namespace WTG\Checkout\Interfaces;
 interface OrderItemInterface
 {
     /**
+     * Set the order item id
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setId(string $id);
+
+    /**
      * Get the quote item id.
      *
      * @return int
@@ -32,12 +40,4 @@ interface OrderItemInterface
      * @return float
      */
     public function getQuantity();
-
-    /**
-     * Set the product id.
-     *
-     * @param  int  $productId
-     * @return $this
-     */
-    public function setProductId(int $productId);
 }

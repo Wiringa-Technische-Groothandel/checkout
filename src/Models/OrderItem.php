@@ -26,27 +26,30 @@ class OrderItem extends Model implements OrderItemInterface
     public $timestamps = false;
 
     /**
-     * The quote this item belongs to
+     * The order this item belongs to
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function order()
+    protected function order()
     {
         return $this->belongsTo(Order::class);
     }
 
     /**
-     * The product this quote item is referencing
+     * Set the order item id
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @param  string  $id
+     * @return $this
      */
-    public function product()
+    public function setId(string $id)
     {
-        return $this->belongsTo(Product::class);
+        $this->attributes['id'] = $id;
+
+        return $this;
     }
 
     /**
-     * Get the quote item id
+     * Get the order item id
      *
      * @return int
      */
@@ -76,28 +79,5 @@ class OrderItem extends Model implements OrderItemInterface
     public function getQuantity()
     {
         return $this->attributes['quantity'];
-    }
-
-    /**
-     * Get the attached product.
-     *
-     * @return Product|null
-     */
-    public function getProduct()
-    {
-        return $this->product;
-    }
-
-    /**
-     * Set the product id.
-     *
-     * @param  int  $productId
-     * @return $this
-     */
-    public function setProductId(int $productId)
-    {
-        $this->attributes['product_id'] = $productId;
-
-        return $this;
     }
 }

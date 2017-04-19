@@ -4,7 +4,12 @@ namespace WTG\Checkout\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteProductRequest extends FormRequest
+/**
+ * Update product request
+ *
+ * @author  Thomas Wiringa  <thomas.wiringa@gmail.com>
+ */
+class UpdateProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +29,7 @@ class DeleteProductRequest extends FormRequest
     public function rules()
     {
         return [
-            "product" => "number"
+            "quantity" => "required"
         ];
     }
 }

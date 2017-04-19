@@ -12,11 +12,18 @@ namespace WTG\Checkout\Interfaces;
 interface QuoteItemInterface
 {
     /**
-     * Get the quote item id.
+     * Set the quote item id.
      *
      * @return int
      */
-    public function getId();
+    public function setId(string $id);
+
+    /**
+     * Get the quote item id.
+     *
+     * @return string
+     */
+    public function getId(): string;
 
     /**
      * Set the quantity.
@@ -36,8 +43,15 @@ interface QuoteItemInterface
     /**
      * Set the product id.
      *
-     * @param  int  $productId
+     * @param  string  $productId
      * @return $this
      */
-    public function setProductId(int $productId);
+    public function setProductId(string $productId);
+
+    /**
+     * Get the product id.
+     *
+     * @return string
+     */
+    public function getProductId(): string;
 }
