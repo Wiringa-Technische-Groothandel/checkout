@@ -15,7 +15,6 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('customer_id');
-            $table->uuid('company_id');
             $table->string('address');
             $table->string('phone');
             $table->text('comment');

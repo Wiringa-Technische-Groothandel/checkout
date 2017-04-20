@@ -40,16 +40,6 @@ class Order extends Model implements OrderInterface
     }
 
     /**
-     * The order items
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    protected function items()
-    {
-        return $this->hasMany(app()->make(OrderItemInterface::class));
-    }
-
-    /**
      * Set the order id
      *
      * @param  string  $id
@@ -70,29 +60,6 @@ class Order extends Model implements OrderInterface
     public function getId(): string
     {
         return $this->attributes['id'];
-    }
-
-    /**
-     * Set the company id.
-     *
-     * @param  int  $id
-     * @return $this
-     */
-    public function setCompanyId(int $id)
-    {
-        $this->attributes['company_id'] = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get the company id.
-     *
-     * @return string
-     */
-    public function getCompanyId(): string
-    {
-        return $this->attributes['company_id'];
     }
 
     /**

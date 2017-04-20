@@ -4,6 +4,13 @@ namespace WTG\Checkout\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Add product request
+ *
+ * @package     WTG\Checkout
+ * @subpackage  Requests
+ * @author      Thomas Wiringa  <thomas.wiringa@gmail.com>
+ */
 class AddProductRequest extends FormRequest
 {
     /**
@@ -25,7 +32,7 @@ class AddProductRequest extends FormRequest
     {
         return [
             "product" => ["required", "exists:products,id"],
-            "quantity" => ["required", "min:1", "max:1000"]
+            "quantity" => ["required", "min:1", "max:1000", "numeric"]
         ];
     }
 }

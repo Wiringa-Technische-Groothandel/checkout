@@ -2,9 +2,9 @@
 
 namespace WTG\Checkout\Interfaces;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use WTG\Customer\Interfaces\CustomerInterface;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Quote interface
@@ -16,13 +16,22 @@ use WTG\Customer\Interfaces\CustomerInterface;
 interface QuoteInterface
 {
     /**
-     * Get a quote by the user, or create a new one if the user has not active quote
+     * Customer scope
+     *
+     * @param  Builder  $query
+     * @param  string  $customerId
+     * @return Builder
+     */
+    public function scopeCustomer(Builder $query, string $customerId): Builder;
+
+    /**
+     * Get a quote by the user, or create a new one if the user
+     * does not have an active quote
      *
      * @param  string  $customerId
-     * @param  string  $companyId
      * @return QuoteInterface
      */
-    public static function findQuoteByCustomerId(string $customerId, string $companyId): QuoteInterface;
+    public static function findQuoteByCustomerId(string $customerId): QuoteInterface;
 
     /**
      * Get the quote id
@@ -74,9 +83,13 @@ interface QuoteInterface
      *
      * @param  string  $productId
      * @param  float  $quantity
-     * @return bool|Model
+     * @param  string  $sku
+     * @param  string  $name
+     * @param  float  $price
+     * @param  float  $subtotal
+     * @return bool
      */
-    public function addProduct(string $productId, float $quantity = 1.00);
+    public function addProduct(string $productId, float $quantity = 1.00, string $sku, string $name, float $price, float $subtotal): bool;
 
     /**
      * Edit a quote item.
@@ -98,10 +111,9 @@ interface QuoteInterface
     /**
      * Get the sum of the price of all quote items.
      *
-     * @param  bool  $withDiscount
      * @return float
      */
-    public function getGrandTotal(bool $withDiscount): float;
+    public function getGrandTotal(): float;
 
     /**
      * Get the associated items
@@ -109,13 +121,6 @@ interface QuoteInterface
      * @return Collection
      */
     public function getItems(): Collection;
-
-    /**
-     * Get the customer
-     *
-     * @return CustomerInterface
-     */
-    public function getCustomer(): CustomerInterface;
 
     /**
      * Get the number of items in the quote.

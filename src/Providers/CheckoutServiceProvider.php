@@ -34,8 +34,6 @@ class CheckoutServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadRoutesFrom(__DIR__.'/../routes.php');
-
         $this->loadMigrationsFrom(__DIR__.'/../Migrations');
 
         $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'checkout');
@@ -43,7 +41,8 @@ class CheckoutServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             if (\Auth::check()) {
                 if ($this->quote === null) {
-                    $this->quote = Quote::findQuoteByCustomerId(\Auth::id(), \Auth::user()->getCompanyId());
+                    $this->quote = $this->app->make(QuoteInterface::class)
+                        ->findQuoteByCustomerId(\Auth::id(), \Auth::user()->getCompanyId());
                 }
 
                 $view->with('quote', $this->quote);

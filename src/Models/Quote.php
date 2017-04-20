@@ -2,15 +2,14 @@
 
 namespace WTG\Checkout\Models;
 
-use Illuminate\Database\Eloquent\Collection;
-use WTG\Catalog\Interfaces\ProductInterface;
-use WTG\Checkout\Exceptions\QuoteItemNotFoundException;
-use WTG\Checkout\Interfaces\QuoteItemInterface;
-use WTG\Customer\Interfaces\CustomerInterface;
+use Webpatser\Uuid\Uuid;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use WTG\Checkout\Interfaces\OrderInterface;
 use WTG\Checkout\Interfaces\QuoteInterface;
-use Illuminate\Database\Eloquent\Model;
-use Webpatser\Uuid\Uuid;
+use Illuminate\Database\Eloquent\Collection;
+use WTG\Checkout\Interfaces\QuoteItemInterface;
+use WTG\Checkout\Exceptions\QuoteItemNotFoundException;
 
 /**
  * Class Quote
@@ -27,38 +26,38 @@ class Quote extends Model implements QuoteInterface
     public $incrementing = false;
 
     /**
-     * Get a quote by the user, or create a new one if the user has not active quote
+     * Customer scope
+     *
+     * @param  Builder  $query
+     * @param  string  $customerId
+     * @return Builder
+     */
+    public function scopeCustomer(Builder $query, string $customerId): Builder
+    {
+        return $query->where('customer_id', $customerId);
+    }
+
+    /**
+     * Get a quote by the user, or create a new one if the user
+     * does not have an active quote
      *
      * @param  string  $customerId
-     * @param  string  $companyId
      * @return QuoteInterface
      */
-    public static function findQuoteByCustomerId(string $customerId, string $companyId): QuoteInterface
+    public static function findQuoteByCustomerId(string $customerId): QuoteInterface
     {
         $quote = app()->make(QuoteInterface::class)
-            ->where('customer_id', $customerId)
-            ->where('company_id', $companyId)
+            ->customer($customerId)
             ->first();
 
         if ($quote === null) {
-            $quote = new static;
+            $quote = app()->make(QuoteInterface::class);
             $quote->setId(Uuid::generate(4));
             $quote->setCustomerId($customerId);
-            $quote->setCompanyId($companyId);
             $quote->save();
         }
 
         return $quote;
-    }
-
-    /**
-     * The items in this quote
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    protected function items()
-    {
-        return $this->hasMany(app()->make(QuoteItemInterface::class));
     }
 
     /**
@@ -131,13 +130,17 @@ class Quote extends Model implements QuoteInterface
     }
 
     /**
-     * Add a product to the quote or modify it if product exists
+     * Add a product to the quote or modify if it exists.
      *
      * @param  string  $productId
      * @param  float  $quantity
-     * @return bool|Model
+     * @param  string  $sku
+     * @param  string  $name
+     * @param  float  $price
+     * @param  float  $subtotal
+     * @return bool
      */
-    public function addProduct(string $productId, float $quantity = 1.00)
+    public function addProduct(string $productId, float $quantity = 1.00, string $sku, string $name, float $price, float $subtotal): bool
     {
         if ($quantity <= 0.00) {
             return $this->removeProduct($productId);
@@ -148,12 +151,17 @@ class Quote extends Model implements QuoteInterface
         } catch (QuoteItemNotFoundException $e) {
             $quoteItem = app()->make(QuoteItemInterface::class);
             $quoteItem->setId(Uuid::generate(4));
+            $quoteItem->setQuoteId($this->getId());
             $quoteItem->setProductId($productId);
+            $quoteItem->setName($name);
+            $quoteItem->setSku($sku);
+            $quoteItem->setPrice($price);
+            $quoteItem->setSubtotal($subtotal);
         }
 
         $quoteItem->setQuantity($quantity);
 
-        return $this->items()->save($quoteItem);
+        return $quoteItem->save();
     }
 
     /**
@@ -184,7 +192,9 @@ class Quote extends Model implements QuoteInterface
         $quoteItem = $this->getQuoteItemByProductId($productId);
 
         if ($quoteItem === null) {
-            return false;
+            // Return in success as apparently there is no quote item associated with
+            // the given product id (anymore).
+            return true;
         }
 
         return (bool) $quoteItem->delete();
@@ -193,16 +203,12 @@ class Quote extends Model implements QuoteInterface
     /**
      * Get the grand total
      *
-     * @param  bool  $withDiscount
      * @return float
      */
-    public function getGrandTotal(bool $withDiscount): float
+    public function getGrandTotal(): float
     {
-        return $this->getItems()->sum(function ($item) use ($withDiscount) {
-            return (float) $item->getProduct()->getPrice(
-                $withDiscount,
-                $item->getQuantity()
-            );
+        return $this->getItems()->sum(function ($item) {
+            return $item->getSubtotal();
         });
     }
 
@@ -213,17 +219,9 @@ class Quote extends Model implements QuoteInterface
      */
     public function getItems(): Collection
     {
-        return $this->items;
-    }
-
-    /**
-     * Get the customer
-     *
-     * @return CustomerInterface
-     */
-    public function getCustomer(): CustomerInterface
-    {
-        return $this->customer;
+        return app()->make(QuoteItemInterface::class)
+            ->where('quote_id', $this->getId())
+            ->get();
     }
 
     /**
@@ -233,7 +231,7 @@ class Quote extends Model implements QuoteInterface
      */
     public function getItemCount(): int
     {
-        return $this->items()->count();
+        return $this->getItems()->count();
     }
 
     /**
@@ -261,7 +259,10 @@ class Quote extends Model implements QuoteInterface
      */
     protected function getQuoteItemByProductId(string $productId)
     {
-        $quoteItem = $this->items()->where('product_id', $productId)->first();
+        $quoteItem = app()->make(QuoteItemInterface::class)
+            ->where('quote_id', $this->getId())
+            ->where('product_id', $productId)
+            ->first();
 
         if ($quoteItem === null) {
             throw new QuoteItemNotFoundException;

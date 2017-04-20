@@ -36,10 +36,18 @@ class CartController extends Controller
     public function add(AddProductRequest $request)
     {
         $quote = $this->getActiveQuote();
+        /** @var ProductInterface $product */
         $product = app()->make(ProductInterface::class)
             ->find($request->input('product'));
 
-        if ($quote->addProduct($product->getId(), $request->input('quantity'))) {
+        $added = $quote->addProduct(
+            $product->getId(),
+            $request->input('quantity'),
+            $product->getName(),
+            $product->getSku()
+        );
+
+        if ($added) {
             return response([
                 'success' => true,
                 'message' => trans('checkout::cart.item_add_success'),

@@ -17,7 +17,12 @@ class CreateQuoteItemsTable extends Migration
             $table->uuid('id')->primary();
             $table->uuid('quote_id');
             $table->uuid('product_id');
-            $table->double('quantity');
+            $table->string('sku');
+            $table->string('name');
+            $table->float('quantity');
+            $table->float('price');
+            $table->float('subtotal');
+            $table->timestamps();
         });
     }
 

@@ -26,16 +26,6 @@ class OrderItem extends Model implements OrderItemInterface
     public $timestamps = false;
 
     /**
-     * The order this item belongs to
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    protected function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
-
-    /**
      * Set the order item id
      *
      * @param  string  $id
@@ -59,6 +49,29 @@ class OrderItem extends Model implements OrderItemInterface
     }
 
     /**
+     * Set the order id.
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setOrderId(string $id)
+    {
+        $this->attributes['order_id'] = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the order id.
+     *
+     * @return string
+     */
+    public function getOrderId(): string
+    {
+        return $this->attributes['order_id'];
+    }
+
+    /**
      * Set the quantity
      *
      * @param  float  $quantity
@@ -79,5 +92,51 @@ class OrderItem extends Model implements OrderItemInterface
     public function getQuantity()
     {
         return $this->attributes['quantity'];
+    }
+
+    /**
+     * Set the name.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function setName(string $name)
+    {
+        $this->attributes['name'] = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get the name.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->attributes['name'];
+    }
+
+    /**
+     * Set the sku.
+     *
+     * @param  string  $sku
+     * @return $this
+     */
+    public function setSku(string $sku)
+    {
+        $this->attributes['sku'] = $sku;
+
+        return $this;
+    }
+
+    /**
+     * Get the sku.
+     *
+     * @return string
+     */
+    public function getSku(): string
+    {
+        return $this->attributes['sku'];
     }
 }

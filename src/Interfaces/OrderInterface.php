@@ -43,21 +43,6 @@ interface OrderInterface
     public function getId(): string;
 
     /**
-     * Set the company id.
-     *
-     * @param  int  $id
-     * @return $this
-     */
-    public function setCompanyId(int $id);
-
-    /**
-     * Get the company id.
-     *
-     * @return string
-     */
-    public function getCompanyId(): string;
-
-    /**
      * Set the customer id.
      *
      * @param  int  $id

@@ -17,7 +17,7 @@ class CreateOrderItemsTable extends Migration
             $table->uuid('order_id');
             $table->string('sku');
             $table->string('name');
-            $table->double('quantity');
+            $table->float('quantity');
         });
     }
 

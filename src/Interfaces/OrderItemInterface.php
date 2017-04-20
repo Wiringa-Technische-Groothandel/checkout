@@ -27,6 +27,21 @@ interface OrderItemInterface
     public function getId();
 
     /**
+     * Set the order id.
+     *
+     * @param  string  $id
+     * @return $this
+     */
+    public function setOrderId(string $id);
+
+    /**
+     * Get the order id.
+     *
+     * @return string
+     */
+    public function getOrderId(): string;
+
+    /**
      * Set the quantity.
      *
      * @param  float  $quantity
@@ -40,4 +55,34 @@ interface OrderItemInterface
      * @return float
      */
     public function getQuantity();
+
+    /**
+     * Set the name.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function setName(string $name);
+
+    /**
+     * Get the name.
+     *
+     * @return string
+     */
+    public function getName(): string;
+
+    /**
+     * Set the sku.
+     *
+     * @param  string  $sku
+     * @return $this
+     */
+    public function setSku(string $sku);
+
+    /**
+     * Get the sku.
+     *
+     * @return string
+     */
+    public function getSku(): string;
 }
