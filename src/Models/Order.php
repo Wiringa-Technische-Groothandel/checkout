@@ -22,21 +22,15 @@ class Order extends Model implements OrderInterface
     public $incrementing = false;
 
     /**
-     * @param  string  $companyId
-     * @return Builder
-     */
-    public static function getByCompanyId(string $companyId): Builder
-    {
-        return static::where('company_id', $companyId);
-    }
-
-    /**
+     * Customer scope
+     *
+     * @param  Builder  $query
      * @param  string  $customerId
      * @return Builder
      */
-    public function getByCustomerId(string $customerId): Builder
+    public function scopeCustomer(Builder $query, string $customerId): Builder
     {
-        return static::where('customer_id', $customerId);
+        return $query->where('customer_id', $customerId);
     }
 
     /**

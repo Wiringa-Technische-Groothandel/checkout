@@ -14,18 +14,13 @@ use Illuminate\Database\Eloquent\Builder;
 interface OrderInterface
 {
     /**
-     * Get orders by the company id.
+     * Customer scope
      *
-     * @param  string  $companyId
-     * @return Builder
-     */
-    public static function getByCompanyId(string $companyId): Builder;
-
-    /**
+     * @param  Builder  $query
      * @param  string  $customerId
      * @return Builder
      */
-    public function getByCustomerId(string $customerId): Builder;
+    public function scopeCustomer(Builder $query, string $customerId): Builder;
 
     /**
      * Set the order id
