@@ -2,19 +2,15 @@
 
 namespace WTG\Checkout\Controllers;
 
-use WTG\Catalog\Interfaces\ProductInterface;
-use WTG\Checkout\Interfaces\QuoteItemInterface;
-use WTG\Checkout\Models\Quote;
-use WTG\Catalog\Models\Product;
-use Illuminate\Routing\Controller;
+use WTG\Http\Controllers\Controller;
 use WTG\Checkout\Interfaces\QuoteInterface;
+use WTG\Catalog\Interfaces\ProductInterface;
 use WTG\Checkout\Requests\AddProductRequest;
-use WTG\Checkout\Requests\EditProductRequest;
-use WTG\Checkout\Requests\DeleteProductRequest;
+use WTG\Checkout\Interfaces\QuoteItemInterface;
 use WTG\Checkout\Requests\UpdateProductRequest;
 
 /**
- * Cart controller
+ * Cart controller.
  *
  * @package     WTG\Checkout
  * @subpackage  Controllers
@@ -28,6 +24,22 @@ class CartController extends Controller
     protected $quote;
 
     /**
+     * Show the cart.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function view()
+    {
+        $customer = \Auth::user();
+        $quote_items = app()->make(QuoteInterface::class)
+            ->findQuoteByCustomerId($customer->getId(), $customer->getCompanyId())->getItems();
+
+        $this->recalculatePrices();
+
+        return view('checkout::cart', compact('quote_items'));
+    }
+
+    /**
      * Add a product to the cart.
      *
      * @param  AddProductRequest  $request
@@ -35,16 +47,28 @@ class CartController extends Controller
      */
     public function add(AddProductRequest $request)
     {
+        $productId = $request->input('product');
+        $quantity = (int) $request->input('quantity');
         $quote = $this->getActiveQuote();
         /** @var ProductInterface $product */
         $product = app()->make(ProductInterface::class)
-            ->find($request->input('product'));
+            ->find($productId);
+
+        if ($product === null) {
+            return response([
+                'success' => false,
+                'message' => trans('checkout::cart.product_not_found', ['product' => $productId]),
+                'count' => $quote->getItemCount()
+            ]);
+        }
 
         $added = $quote->addProduct(
             $product->getId(),
-            $request->input('quantity'),
+            $quantity,
+            $product->getSku(),
             $product->getName(),
-            $product->getSku()
+            $product->getPrice(true),
+            $product->getPrice(true, $quantity)
         );
 
         if ($added) {
@@ -59,34 +83,6 @@ class CartController extends Controller
             'success' => false,
             'message' => trans('checkout::cart.item_add_error')
         ], 400);
-    }
-
-    /**
-     * Edit an item in the cart.
-     *
-     * @param  EditProductRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function edit(EditProductRequest $request)
-    {
-        $quote = $this->getActiveQuote();
-        $products = $request->input('products');
-
-        try {
-            $quote->getItems()->each(function ($item) use ($products) {
-                $qty = $products[$item->getId()]['qty'] ?? 0;
-                $item->setQuantity($qty);
-                $item->save();
-            });
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage(), $e->getTrace());
-
-            return back()
-                ->withErrors(trans('checkout::cart.item_update_error'));
-        }
-
-        return back()
-            ->with('status', trans('checkout::cart.item_update_success'));
     }
 
     /**
@@ -127,7 +123,7 @@ class CartController extends Controller
     public function update(UpdateProductRequest $request, string $id)
     {
         $quote = $this->getActiveQuote();
-        $qty = $request->input('quantity');
+        $qty = (int) $request->input('quantity');
         /** @var QuoteItemInterface $quoteItem */
         $quoteItem = $quote->getItems()->first(function ($item) use ($id) {
             return $item->getId() === $id;
@@ -150,10 +146,12 @@ class CartController extends Controller
             return response([
                 'success' => false,
                 'message' => 'Het product is verwijderd uit uw winkelmandje omdat het product niet (meer) in ons assortiment zit.'
-            ]);
+            ], 400);
         }
 
-        $quoteItem->setQuantity((int) $qty);
+        $quoteItem->setQuantity($qty);
+        $quoteItem->setPrice($product->getPrice(true));
+        $quoteItem->setSubtotal($product->getPrice(true, $qty));
         $quoteItem->save();
 
         return response([
@@ -180,7 +178,8 @@ class CartController extends Controller
 
         if ($quote->delete()) {
             return response([
-                'success' => true
+                'success' => true,
+                'message' => trans('checkout::cart.destroy_success')
             ]);
         }
 
@@ -201,8 +200,35 @@ class CartController extends Controller
             return $this->quote;
         }
 
-        $this->quote = Quote::findQuoteByCustomerId(\Auth::id(), \Auth::user()->getCompanyId());
+        $this->quote = app()->make(QuoteInterface::class)
+            ->findQuoteByCustomerId(\Auth::id(), \Auth::user()->getCompanyId());
 
         return $this->quote;
+    }
+
+    /**
+     * Recalculate the quote item prices
+     *
+     * @return void
+     */
+    protected function recalculatePrices()
+    {
+        $quote = $this->getActiveQuote();
+
+        $quote->getItems()->each(function ($item) {
+            /** @var QuoteItemInterface $item */
+            /** @var ProductInterface $product */
+            $product = app()->make(ProductInterface::class)->find($item->getProductId());
+
+            if ($product === null) {
+                $item->delete();
+
+                return;
+            }
+
+            $item->setPrice($product->getPrice(true));
+            $item->setSubtotal($product->getPrice(true, $item->getQuantity()));
+            $item->save();
+        });
     }
 }

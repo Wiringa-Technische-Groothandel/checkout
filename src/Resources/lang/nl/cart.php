@@ -25,5 +25,6 @@ return [
     "continue" => "Verder winkelen",
     "destroy" => "Winkelwagen legen",
     "finish" => "Bestelling afronden",
-    "update" => "Winkelwagen bijwerken"
+    "update" => "Winkelwagen bijwerken",
+    "empty" => "Uw winkelwagen bevat nog geen producten"
 ];
